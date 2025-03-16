@@ -56,7 +56,7 @@ async def start_program(request: Request):
             if hasattr(eyegame, "start_game"):
                 eyegame.start_game()
         elif program == "hand_tracking_control":
-            import hand  # from hand.py (or hand1.py, if that's your preferred module)
+            import hand  # from hand.py
             if hasattr(hand, "start_tracking"):
                 hand.start_tracking()
         elif program == "hand_tracking_game":
@@ -154,6 +154,18 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception as e:
         logging.error(f"Error in WebSocket connection: {e}")
         await websocket.close()
+
+# Control panel configuration endpoint
+programs = [
+    {"id": "eye_tracking_control", "name": "Eye Tracking Control", "description": "Control cursor with your eyes"},
+    {"id": "eye_tracking_game", "name": "Eye Tracking Game", "description": "Play games with eye movements"},
+    {"id": "hand_tracking_control", "name": "Hand Tracking Control", "description": "Control cursor with hand gestures"},
+    {"id": "hand_tracking_game", "name": "Hand Tracking Game", "description": "Play games with hand gestures"},
+]
+
+@app.get("/api/control-panel")
+async def get_control_panel():
+    return {"programs": programs}
 
 if __name__ == "__main__":
     import uvicorn
