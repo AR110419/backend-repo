@@ -12,7 +12,7 @@ opencv-python-headless = "4.11.0.86"
 mediapipe = "0.10.21"
 pygame = "2.6.1"
 pyautogui = "0.9.54"
-numpy = "2.2.3"
+numpy = "1.23.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
