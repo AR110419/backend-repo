@@ -37,34 +37,41 @@ async def start_program(request: Request):
     body = await request.json()
     program = body.get("program")
     if not program:
-        return JSONResponse(status_code=400, content={"error": "Program not specified"})
+        return JSONResponse(
+            status_code=400, content={"error": "Program not specified"}
+        )
 
     active_program = program
     logging.info(f"Starting program: {program}")
 
     try:
         if program == "eye_tracking_control":
-            import eye  # from eye.py
+            import eye
             if hasattr(eye, "start_tracking"):
                 eye.start_tracking()
         elif program == "eye_tracking_game":
-            import eyegame  # from eyegame.py
+            import eyegame
             if hasattr(eyegame, "start_game"):
                 eyegame.start_game()
         elif program == "hand_tracking_control":
-            import hand  # from hand.py
-            if hasattr(hand, "start_tracking"):
-                hand.start_tracking()
+            # Use hands1.py instead of hand.py for hand detection.
+            import hand1
+            if hasattr(hand1, "start_tracking"):
+                hand1.start_tracking()
         elif program == "hand_tracking_game":
-            import gesturegame  # from gesturegame.py
+            import gesturegame
             if hasattr(gesturegame, "start_game"):
                 gesturegame.start_game()
         else:
             logging.warning(f"Unknown program: {program}")
-            return JSONResponse(status_code=400, content={"error": "Unknown program"})
+            return JSONResponse(
+                status_code=400, content={"error": "Unknown program"}
+            )
     except Exception as e:
         logging.error(f"Error starting program {program}: {e}")
-        return JSONResponse(status_code=500, content={"error": f"Error starting program: {str(e)}"})
+        return JSONResponse(
+            status_code=500, content={"error": f"Error starting program: {str(e)}"}
+        )
 
     return {"message": f"Program {program} started"}
 
@@ -78,7 +85,9 @@ async def terminate_program(request: Request):
     body = await request.json()
     program = body.get("program")
     if active_program != program:
-        return JSONResponse(status_code=400, content={"error": "Program mismatch or no active program"})
+        return JSONResponse(
+            status_code=400, content={"error": "Program mismatch or no active program"}
+        )
 
     logging.info(f"Terminating program: {program}")
     try:
@@ -91,25 +100,29 @@ async def terminate_program(request: Request):
             if hasattr(eyegame, "terminate_game"):
                 eyegame.terminate_game()
         elif program == "hand_tracking_control":
-            import hand
-            if hasattr(hand, "terminate_tracking"):
-                hand.terminate_tracking()
+            import hand1
+            if hasattr(hand1, "terminate_tracking"):
+                hand1.terminate_tracking()
         elif program == "hand_tracking_game":
             import gesturegame
             if hasattr(gesturegame, "terminate_game"):
                 gesturegame.terminate_game()
         else:
             logging.warning(f"Unknown program: {program}")
-            return JSONResponse(status_code=400, content={"error": "Unknown program"})
+            return JSONResponse(
+                status_code=400, content={"error": "Unknown program"}
+            )
     except Exception as e:
         logging.error(f"Error terminating program {program}: {e}")
-        return JSONResponse(status_code=500, content={"error": f"Error terminating program: {str(e)}"})
+        return JSONResponse(
+            status_code=500, content={"error": f"Error terminating program: {str(e)}"}
+        )
 
     active_program = None
     return {"message": f"Program {program} terminated"}
 
 @app.websocket("/ws/tracking")
-async def websocket_endpoint(websocket):
+async def websocket_endpoint(websocket: WebSocket):
     """
     WebSocket endpoint to stream real-time tracking data.
     Expects an initial JSON message with the program info.
