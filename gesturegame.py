@@ -3,7 +3,7 @@ import pygame
 import random
 
 logging.basicConfig(level=logging.INFO)
-
+print("arun")
 # Initialize Pygame
 pygame.init()
 screen = pygame.display.set_mode((800, 600))
