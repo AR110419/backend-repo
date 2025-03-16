@@ -14,8 +14,8 @@ app = FastAPI()
 # Configure CORS to allow all origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],       # Allow every origin
-    allow_credentials=False,   # Credentials must be false when allow_origins is ["*"]
+    allow_origins=["*"],  # Allow every origin
+    allow_credentials=False,  # Credentials must be false when allow_origins is ["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -23,7 +23,6 @@ app.add_middleware(
 # Global variable to store the currently active program
 active_program = None
 
-# Health endpoint for Render's health check
 @app.get("/health")
 async def health():
     return {"status": "ok"}
@@ -33,8 +32,6 @@ async def start_program(request: Request):
     """
     Start a tracking or game program.
     Expected JSON body: { "program": "<program_name>" }
-    
-    This endpoint dynamically imports and calls the corresponding start function.
     """
     global active_program
     body = await request.json()
@@ -42,7 +39,6 @@ async def start_program(request: Request):
     if not program:
         return JSONResponse(status_code=400, content={"error": "Program not specified"})
 
-    # Optionally, terminate any currently active program before starting a new one.
     active_program = program
     logging.info(f"Starting program: {program}")
 
@@ -77,8 +73,6 @@ async def terminate_program(request: Request):
     """
     Terminate the currently running program.
     Expected JSON body: { "program": "<program_name>" }
-    
-    This endpoint dynamically imports and calls the corresponding termination function.
     """
     global active_program
     body = await request.json()
@@ -115,22 +109,18 @@ async def terminate_program(request: Request):
     return {"message": f"Program {program} terminated"}
 
 @app.websocket("/ws/tracking")
-async def websocket_endpoint(websocket: WebSocket):
+async def websocket_endpoint(websocket):
     """
     WebSocket endpoint to stream real-time tracking data.
-    
-    Expects an initial JSON message with the program info, then sends simulated tracking data.
-    Replace the simulation logic with your actual tracking data if available.
+    Expects an initial JSON message with the program info.
     """
     await websocket.accept()
     try:
-        # Wait for the initial message to know which program is active
         data = await websocket.receive_text()
         init_data = json.loads(data)
         program = init_data.get("program")
         logging.info(f"WebSocket connection initiated for program: {program}")
 
-        # Simulate sending tracking data every second
         while True:
             tracking_data = {
                 "eye": {
@@ -146,7 +136,6 @@ async def websocket_endpoint(websocket: WebSocket):
             }
             if random.random() > 0.8:
                 tracking_data["hand"]["gestures"].append(random.choice(["pinch", "grab", "point"]))
-            
             await websocket.send_text(json.dumps(tracking_data))
             await asyncio.sleep(1)
     except WebSocketDisconnect:
@@ -156,7 +145,7 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.close()
 
 # Control panel configuration endpoint
-programs = [
+control_panel_programs = [
     {"id": "eye_tracking_control", "name": "Eye Tracking Control", "description": "Control cursor with your eyes"},
     {"id": "eye_tracking_game", "name": "Eye Tracking Game", "description": "Play games with eye movements"},
     {"id": "hand_tracking_control", "name": "Hand Tracking Control", "description": "Control cursor with hand gestures"},
@@ -165,7 +154,7 @@ programs = [
 
 @app.get("/api/control-panel")
 async def get_control_panel():
-    return {"programs": programs}
+    return {"programs": control_panel_programs}
 
 if __name__ == "__main__":
     import uvicorn
