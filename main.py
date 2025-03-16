@@ -37,9 +37,7 @@ async def start_program(request: Request):
     body = await request.json()
     program = body.get("program")
     if not program:
-        return JSONResponse(
-            status_code=400, content={"error": "Program not specified"}
-        )
+        return JSONResponse(status_code=400, content={"error": "Program not specified"})
 
     active_program = program
     logging.info(f"Starting program: {program}")
@@ -54,7 +52,6 @@ async def start_program(request: Request):
             if hasattr(eyegame, "start_game"):
                 eyegame.start_game()
         elif program == "hand_tracking_control":
-            # Use hands1.py instead of hand.py for hand detection.
             import hand1
             if hasattr(hand1, "start_tracking"):
                 hand1.start_tracking()
@@ -64,14 +61,10 @@ async def start_program(request: Request):
                 gesturegame.start_game()
         else:
             logging.warning(f"Unknown program: {program}")
-            return JSONResponse(
-                status_code=400, content={"error": "Unknown program"}
-            )
+            return JSONResponse(status_code=400, content={"error": "Unknown program"})
     except Exception as e:
         logging.error(f"Error starting program {program}: {e}")
-        return JSONResponse(
-            status_code=500, content={"error": f"Error starting program: {str(e)}"}
-        )
+        return JSONResponse(status_code=500, content={"error": f"Error starting program: {str(e)}"})
 
     return {"message": f"Program {program} started"}
 
@@ -85,9 +78,7 @@ async def terminate_program(request: Request):
     body = await request.json()
     program = body.get("program")
     if active_program != program:
-        return JSONResponse(
-            status_code=400, content={"error": "Program mismatch or no active program"}
-        )
+        return JSONResponse(status_code=400, content={"error": "Program mismatch or no active program"})
 
     logging.info(f"Terminating program: {program}")
     try:
@@ -109,14 +100,10 @@ async def terminate_program(request: Request):
                 gesturegame.terminate_game()
         else:
             logging.warning(f"Unknown program: {program}")
-            return JSONResponse(
-                status_code=400, content={"error": "Unknown program"}
-            )
+            return JSONResponse(status_code=400, content={"error": "Unknown program"})
     except Exception as e:
         logging.error(f"Error terminating program {program}: {e}")
-        return JSONResponse(
-            status_code=500, content={"error": f"Error terminating program: {str(e)}"}
-        )
+        return JSONResponse(status_code=500, content={"error": f"Error terminating program: {str(e)}"})
 
     active_program = None
     return {"message": f"Program {program} terminated"}
