@@ -1,7 +1,7 @@
-fastapi==0.95.2
-uvicorn==0.21.1
-opencv-python-headless==4.5.5.64
-mediapipe==0.10.20
+fastapi==0.115.11
+uvicorn==0.34.0
+opencv-python-headless==4.11.0.86
+mediapipe==0.10.2
 pygame==2.6.1
-pyautogui==0.9.53
-numpy==1.21.4
+pyautogui==0.9.54
+numpy==2.2.3
