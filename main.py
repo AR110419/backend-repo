@@ -1,21 +1,26 @@
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import asyncio
 import json
 import logging
 import random
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 
 # Set up basic logging
 logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 
-# Configure CORS to allow all origins
+# Configure CORS to allow requests from specific origins
+origins = [
+    "https://v0-website-v0-front-end.vercel.app/",  # Add your frontend URL here
+    "http://localhost:3000"  # Add localhost if you're testing locally
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow every origin
-    allow_credentials=False,  # Credentials must be false when allow_origins is ["*"]
+    allow_origins=origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
