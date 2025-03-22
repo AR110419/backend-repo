@@ -1,6 +1,9 @@
 import logging
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
 import pygame
 import random
+import threading
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,6 +27,12 @@ balloons = [{"x": random.randint(100, 700), "y": 600} for _ in range(5)]
 running = True
 score = 0
 
+app = FastAPI()
+
+class EyeLandmarks(BaseModel):
+    x: int
+    y: int
+
 def spawn_balloon():
     """Spawn a balloon at a random position."""
     balloons.append({"x": random.randint(100, 700), "y": 600})
@@ -38,6 +47,23 @@ def detect_eye_movement(eye_landmarks):
             balloons.remove(balloon)
             spawn_balloon()
             score += 1
+
+@app.post("/detect")
+async def detect(request: EyeLandmarks):
+    detect_eye_movement((request.x, request.y))
+    return {"score": score}
+
+@app.get("/start")
+async def start():
+    global running
+    running = True
+    threading.Thread(target=start_game).start()
+    return {"message": "Game started"}
+
+@app.get("/stop")
+async def stop():
+    terminate_game()
+    return {"message": "Game stopped"}
 
 def start_game():
     global running
