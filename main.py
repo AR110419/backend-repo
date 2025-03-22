@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -9,6 +10,11 @@ import random
 # Set up basic logging
 logging.basicConfig(level=logging.INFO)
 
+# Set the XDG_RUNTIME_DIR environment variable
+if 'XDG_RUNTIME_DIR' not in os.environ:
+    os.environ['XDG_RUNTIME_DIR'] = f"/run/user/{os.getuid()}"
+
+# Initialize FastAPI app
 app = FastAPI()
 
 # Configure CORS to allow requests from specific origins
